@@ -212,7 +212,7 @@ class ModuleManager {
 	 * @param array table with loaded modules
 	 * @return array
 	 */
-	private static final function check_dependencies($module_to_check, $version, & $module_table) {
+	private static function check_dependencies($module_to_check, $version, & $module_table) {
 		$req_mod = self::get_required_modules($module_to_check, $version);
 
 		$ret = array();
@@ -741,11 +741,12 @@ class ModuleManager {
 	 */
 	public static final function new_instance($mod,$parent,$name,$clear_vars=false) {
 		$class = str_replace('#', '_', $mod);
-		if (!in_array('Module', class_parents($class))) {
+		
+		if (!is_a($class, Module::class, true)) {
 			trigger_error("Class $mod is not a subclass of Module", E_USER_ERROR);
 		}
-		$m = new $class($mod,$parent,$name,$clear_vars, self::get_container());
-		return $m;
+		
+		return new $class($mod,$parent,$name,$clear_vars, self::get_container());
 	}
 
 	/**
@@ -865,7 +866,8 @@ class ModuleManager {
 		// all commons already loaded by FORCE_CACHE_COMMON_FILES
 		if ($cached) return;
 
-		if (!$commons_with_code = Cache::get('commons_with_code')) {
+		$commons_with_code = Cache::get('commons_with_code');
+		if ($commons_with_code === null) {
 			$commons_with_code = array();
 			foreach ($installed_modules as $row) {
 				$module = $row['name'];
