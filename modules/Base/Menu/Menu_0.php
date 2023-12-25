@@ -133,7 +133,7 @@ class Base_Menu extends Module {
 						$menu[$k][str_replace('_',': ',$old['box_main_module'])] = $old;
 					} else
 						$menu[$k] = array(
-							str_replace('_',': ',$menu[$k]['box_main_module']) =>$menu[$k],
+							str_replace('_',': ',$menu[$k]['box_main_module'] ?? '') =>$menu[$k],
 							'__submenu__'=>1,
 							str_replace('_',': ',$v['box_main_module'])=>$v);
 				}
@@ -142,26 +142,31 @@ class Base_Menu extends Module {
 	}
 
 	public static function sort_menus_cmp($a, $b) {
-		$aw = isset(self::$tmp_menu[$a]['__weight__']) ? self::$tmp_menu[$a]['__weight__']:0;
-		$bw = isset(self::$tmp_menu[$b]['__weight__']) ? self::$tmp_menu[$b]['__weight__']:0;
+		$aw = self::$tmp_menu[$a]['__weight__'] ?? 0;
+		$bw = self::$tmp_menu[$b]['__weight__'] ?? 0;
 		if(!isset($aw) || !is_numeric($aw)) $aw=0;
 		if(!isset($bw) || !is_numeric($bw)) $bw=0;
-		if($aw==$bw)
-			return strcasecmp($a, $b);
-		return $aw-$bw;
+		
+		return $aw==$bw ? strcasecmp($a, $b) : $aw - $bw;
 	}
 
-    private static function sort_menus(& $menu) {
-        self::$tmp_menu = $menu;
-        uksort($menu, array("Base_Menu","sort_menus_cmp"));
-        foreach($menu as &$m) {
-            if(is_array($m) && array_key_exists('__submenu__',$m))
-                self::sort_menus($m);
-			elseif(is_array($m))
-                unset($m['__weight__']);
-        }
-        unset($menu['__weight__']);
-    }
+	private static function sort_menus(& $menu) {
+		self::$tmp_menu = $menu;
+		uksort($menu, [self::class, 'sort_menus_cmp']);
+		foreach($menu as &$item) {
+			if(!is_array($item)) {
+				continue;
+			}
+				
+			if (array_key_exists('__submenu__', $item)) {
+				self::sort_menus($item);
+			}
+			else {
+				unset($item['__weight__']);
+			}
+		}
+		unset($menu['__weight__']);
+	}
 
 	public function body() {
 		// preparing modules menu and tools menu

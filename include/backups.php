@@ -15,7 +15,7 @@ class BackupUtil {
         $this->_backup_store = new BackupStore($backup_dir);
     }
 
-    public static function backup_db($file = null)
+    public static function backup_db($file = null, $tables = array())
     {
         if (\DB::is_postgresql()) {
             throw new Exception('PostgreSQL is not supported yet');
@@ -28,6 +28,7 @@ class BackupUtil {
             'compress' => $compress,
             'add-drop-table' => true,
             'no-data' => array('recordbrowser_search_index', 'session', 'session_client', 'history'),
+        	'include-tables' => $tables,
         );
         $dump = new Mysqldump('mysql:host=' . DATABASE_HOST . ';dbname=' . DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, $options);
         $dump->start($file);

@@ -14,6 +14,7 @@ defined("_VALID_ACCESS") || die('Direct access forbidden');
  * @subpackage module
  */
 class ModuleCommon extends ModulePrimitive {
+	private static $singleton;
 	
 	/* backward compatibility code */
 	public static final function acl_check() {
@@ -25,13 +26,14 @@ class ModuleCommon extends ModulePrimitive {
 	 *
 	 * @return object
 	 */
-	public static final function Instance($arg=null) {
-		static $obj;
-		if(isset($arg)) $obj = $arg;
-		elseif(is_string($obj)) {
-			$cl = $obj.'Common';
-			$obj = new $cl($obj);
+	public static function Instance($arg=null) {
+		if(isset($arg)) {
+			self::$singleton = $arg;
 		}
-		return $obj;
+		elseif(is_string(self::$singleton)) {			
+			$cl = self::$singleton.'Common';
+			self::$singleton = new $cl(self::$singleton);
+		}
+		return self::$singleton;
 	}
 }
