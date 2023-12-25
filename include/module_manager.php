@@ -743,7 +743,7 @@ class ModuleManager {
 		$class = str_replace('#', '_', $mod);
 		
 		if (!is_a($class, Module::class, true)) {
-			trigger_error("Class $mod is not a subclass of Module", E_USER_ERROR);
+			trigger_error("Class $class is not a subclass of Module", E_USER_ERROR);
 		}
 		
 		return new $class($mod,$parent,$name,$clear_vars, self::get_container());
