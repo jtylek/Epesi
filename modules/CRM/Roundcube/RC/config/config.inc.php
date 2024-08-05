@@ -6,7 +6,8 @@ define('SET_SESSION',false);
 $CID = isset($_GET['ECID']) ? $_GET['ECID'] : false;
 define('CID', $CID);
 define('READ_ONLY_SESSION',isset($_GET['_action']) && $_GET['_action']=='plugin.epesi_archive'?false:true);
-error_reporting(E_ALL & ~(E_STRICT | E_NOTICE | E_DEPRECATED));
+//error_reporting(E_ALL & ~(E_STRICT | E_NOTICE | E_DEPRECATED));
+error_reporting(E_ALL & ~(E_STRICT | E_NOTICE | E_DEPRECATED | E_WARNING));
 
 require_once('vendor/autoload.php');
 require_once('include/data_dir.php');
@@ -115,6 +116,9 @@ $config['imap_cache'] = (MEMCACHE_SESSION_SERVER && class_exists('Memcache'))?'m
 // For example %n = mail.domain.tld, %t = domain.tld
 $config['smtp_server'] = ($account['f_smtp_security']?$account['f_smtp_security'].'://':'').$account['f_smtp_server'];
 
+// Log sent messages to <log_dir>/sendmail.log or to syslog
+$config['smtp_log'] = false;
+
 // SMTP port (default is 25; use 587 for STARTTLS or 465 for the
 // deprecated SSL over SMTP (aka SMTPS))
 $config['smtp_port'] = $account['f_smtp_security']=='ssl'?465:25;
@@ -129,7 +133,7 @@ $config['smtp_pass'] = $account['f_smtp_auth']?$account['f_smtp_password']:'';
 
 // provide an URL where a user can get support for this Roundcube installation
 // PLEASE DO NOT LINK TO THE ROUNDCUBE.NET WEBSITE HERE!
-$config['support_url'] =  (EPESI == 'EPESI') ? 'http://epe.si/support/' : Variable::get('whitelabel_url',false);
+$config['support_url'] =  (EPESI == 'EPESI') ? 'https://epesi.org/emailmanagement' : Variable::get('whitelabel_url',false);
 
 // Name your service. This is displayed on the login screen and in the window title
 $config['product_name'] = EPESI . ' Mail';
@@ -147,7 +151,7 @@ $config['plugins'] = array(
 );
 
 // skin name: folder from skins/
-$config['skin'] = 'classic';
+$config['skin'] = 'larry';
 
 $config['log_dir'] = $log_dir;
 $config['temp_dir'] = $data_dir;

@@ -11,12 +11,8 @@
  */
 defined("_VALID_ACCESS") || die('Direct access forbidden');
 
-/**
- * Include AdoDB.
- */
-require_once('libs/adodb/adodb-errorhandler.inc.php');
-require_once('libs/adodb/adodb.inc.php');
 require_once('misc.php');
+require_once('vendor/autoload.php');
 
 /**
  * This class maintains database connection.
@@ -50,6 +46,7 @@ class DB {
 				throw new Exception("Connect to database failed");
 			$new = self::$ado;
 		}
+		$new->fetchMode = ADODB_FETCH_BOTH;
         if (self::is_mysql()) {
 			// For MySQL
     		$new->Execute('SET NAMES "utf8"');
